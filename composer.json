@@ -27,10 +27,10 @@
         "php": "^8.2",
         "spatie/laravel-package-tools": "^1.19",
         "filament/filament": "^4.0|^5.0",
-        "symfony/mailer": "^7.2",
+        "symfony/mailer": "^7.2|^8.0",
         "guzzlehttp/guzzle": "^7.9",
-        "illuminate/contracts": "^11.0|^12.0",
-        "illuminate/support": "^11.0|^12.0",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
         "league/commonmark": "^2.6"
     },
     "autoload-dev": {
