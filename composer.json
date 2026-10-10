@@ -24,7 +24,7 @@
         }
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "spatie/laravel-package-tools": "^1.19",
         "filament/filament": "^4.0|^5.0",
         "symfony/mailer": "^7.2|^8.0",
@@ -39,7 +39,12 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit"
+        "post-autoload-dump": [
+            "@php vendor/bin/testbench package:discover --ansi"
+        ],
+        "test": "vendor/bin/phpunit",
+        "slipway:compile": "vendor/bin/testbench slipway:compile",
+        "slipway:check": "vendor/bin/testbench slipway:check"
     },
     "extra": {
         "laravel": {
@@ -47,6 +52,7 @@
                 "Usamamuneerchaudhary\\Notifier\\NotifierServiceProvider"
             ],
             "aliases": {
+                "Notifier": "Usamamuneerchaudhary\\Notifier\\Facades\\Notifier",
                 "Preference": "Usamamuneerchaudhary\\Notifier\\Facades\\Preference",
                 "Analytics": "Usamamuneerchaudhary\\Notifier\\Facades\\Analytics",
                 "UrlTracking": "Usamamuneerchaudhary\\Notifier\\Facades\\UrlTracking",
@@ -55,8 +61,15 @@
         }
     },
     "require-dev": {
-        "orchestra/testbench": "^9.11",
-        "phpunit/phpunit": "^11.5",
-        "nunomaduro/collision": "^8.6"
-    }
+        "laravel/pint": "^1.18",
+        "nunomaduro/collision": "^8.6",
+        "orchestra/testbench": "^9.11|^10.0|^11.0",
+        "phpunit/phpunit": "^11.5|^12.0|^13.0",
+        "usamamuneerchaudhary/laravel-slipway": "^1.4"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
