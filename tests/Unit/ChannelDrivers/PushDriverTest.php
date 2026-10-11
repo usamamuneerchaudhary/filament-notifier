@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
 use Usamamuneerchaudhary\Notifier\Services\ChannelDrivers\PushDriver;
+use Usamamuneerchaudhary\Notifier\Services\FcmAccessTokenProvider;
 use Usamamuneerchaudhary\Notifier\Tests\UserTestCase;
 
 class PushDriverTest extends UserTestCase
@@ -14,15 +15,21 @@ class PushDriverTest extends UserTestCase
     {
         Http::preventStrayRequests();
         Http::fake([
-            'https://oauth2.googleapis.com/token' => Http::response(['access_token' => 'ya29.test-token'], 200),
             'https://fcm.googleapis.com/v1/projects/demo/messages:send' => Http::response([
                 'name' => 'projects/demo/messages/abc',
             ], 200),
         ]);
 
+        $this->mock(FcmAccessTokenProvider::class, function ($mock): void {
+            $mock->shouldReceive('token')->once()->andReturn('ya29.test-token');
+        });
+
         $this->makeChannel('push', [
             'firebase_project_id' => 'demo',
-            'firebase_service_account' => $this->serviceAccount(),
+            'firebase_service_account' => [
+                'client_email' => 'firebase-adminsdk@demo.iam.gserviceaccount.com',
+                'private_key' => 'unused-in-this-test',
+            ],
         ]);
 
         $user = $this->makeUser(['fcm_token' => 'device-token']);
@@ -76,16 +83,5 @@ class PushDriverTest extends UserTestCase
     {
         parent::setUp();
         Cache::flush();
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private function serviceAccount(): array
-    {
-        return [
-            'client_email' => 'firebase-adminsdk@demo.iam.gserviceaccount.com',
-            'private_key' => file_get_contents(__DIR__.'/../../Fixtures/firebase-private-key.pem'),
-        ];
     }
 }
