@@ -27,10 +27,11 @@ abstract class TestCase extends Orchestra
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
-
+        $app['config']->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
+        $app['config']->set('mail.default', 'array');
     }
 }

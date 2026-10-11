@@ -2,7 +2,6 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\ChartWidget;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
 use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
@@ -10,7 +9,9 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 class NotificationChannelPerformance extends ChartWidget
 {
     protected ?string $heading = 'Channel Performance';
+
     protected static ?int $sort = 5;
+
     protected ?string $pollingInterval = '30s';
 
     public static function canView(): bool
@@ -38,7 +39,7 @@ class NotificationChannelPerformance extends ChartWidget
             $labels[] = $channel->title;
 
             $sent = Notification::where('channel', $channel->type)
-                ->where('status', 'sent')
+                ->dispatched()
                 ->count();
             $opened = Notification::where('channel', $channel->type)
                 ->whereNotNull('opened_at')
@@ -96,4 +97,3 @@ class NotificationChannelPerformance extends ChartWidget
         ];
     }
 }
-

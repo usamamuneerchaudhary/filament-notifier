@@ -2,7 +2,6 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
@@ -11,6 +10,7 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 class NotificationEngagementStats extends BaseWidget
 {
     protected ?string $pollingInterval = '30s';
+
     protected static ?int $sort = 2;
 
     public static function canView(): bool
@@ -22,7 +22,7 @@ class NotificationEngagementStats extends BaseWidget
     {
         $analytics = NotificationSetting::getAnalytics();
 
-        if (!($analytics['enabled'] ?? config('notifier.settings.analytics.enabled', true))) {
+        if (! ($analytics['enabled'] ?? config('notifier.settings.analytics.enabled', true))) {
             return [
                 Stat::make('Analytics Disabled', '')
                     ->description('Enable analytics in settings to view engagement metrics')
@@ -30,7 +30,7 @@ class NotificationEngagementStats extends BaseWidget
             ];
         }
 
-        $totalSent = Notification::where('status', 'sent')->count();
+        $totalSent = Notification::dispatched()->count();
         $totalOpened = Notification::whereNotNull('opened_at')->count();
         $totalClicked = Notification::whereNotNull('clicked_at')->count();
 
@@ -44,28 +44,28 @@ class NotificationEngagementStats extends BaseWidget
 
         return [
             Stat::make('Total Opens', number_format($totalOpens))
-                ->description($totalOpened . ' unique opens')
+                ->description($totalOpened.' unique opens')
                 ->descriptionIcon('heroicon-m-eye')
                 ->color('info')
                 ->chart($this->getOpensChartData()),
 
-            Stat::make('Open Rate', $openRate . '%')
-                ->description($totalOpened . ' of ' . $totalSent . ' emails opened')
+            Stat::make('Open Rate', $openRate.'%')
+                ->description($totalOpened.' of '.$totalSent.' opened (inflated by Apple Mail Privacy Protection; prefer click rate)')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
 
             Stat::make('Total Clicks', number_format($totalClicks))
-                ->description($totalClicked . ' unique clicks')
+                ->description($totalClicked.' unique clicks')
                 ->descriptionIcon('heroicon-m-cursor-arrow-rays')
                 ->color('warning')
                 ->chart($this->getClicksChartData()),
 
-            Stat::make('Click Rate', $clickRate . '%')
-                ->description($totalClicked . ' of ' . $totalSent . ' emails clicked')
+            Stat::make('Click Rate', $clickRate.'%')
+                ->description($totalClicked.' of '.$totalSent.' emails clicked')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('warning'),
 
-            Stat::make('Click-Through Rate', $clickThroughRate . '%')
+            Stat::make('Click-Through Rate', $clickThroughRate.'%')
                 ->description('Clicks per open')
                 ->descriptionIcon('heroicon-m-arrow-path')
                 ->color('success'),
@@ -81,6 +81,7 @@ class NotificationEngagementStats extends BaseWidget
                 ->sum('opens_count');
             $data[] = $count;
         }
+
         return $data;
     }
 
@@ -93,7 +94,7 @@ class NotificationEngagementStats extends BaseWidget
                 ->sum('clicks_count');
             $data[] = $count;
         }
+
         return $data;
     }
 }
-

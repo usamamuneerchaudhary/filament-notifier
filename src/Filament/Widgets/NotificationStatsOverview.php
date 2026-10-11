@@ -1,7 +1,7 @@
 <?php
+
 namespace Usamamuneerchaudhary\Notifier\Filament\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
@@ -19,8 +19,8 @@ class NotificationStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         $totalNotifications = Notification::count();
-        $sentNotifications = Notification::where('status', 'sent')->count();
-        $pendingNotifications = Notification::where('status', 'pending')->count();
+        $sentNotifications = Notification::dispatched()->count();
+        $pendingNotifications = Notification::whereIn('status', ['pending', 'sending'])->count();
         $failedNotifications = Notification::where('status', 'failed')->count();
         $activeChannels = NotificationChannel::where('is_active', true)->count();
 
@@ -37,8 +37,8 @@ class NotificationStatsOverview extends BaseWidget
                 ->chart($recentNotifications)
                 ->color('success'),
 
-            Stat::make('Success Rate', $successRate . '%')
-                ->description($sentNotifications . ' of ' . $totalNotifications . ' sent successfully')
+            Stat::make('Success Rate', $successRate.'%')
+                ->description($sentNotifications.' of '.$totalNotifications.' sent successfully')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
 
@@ -67,7 +67,7 @@ class NotificationStatsOverview extends BaseWidget
             $count = Notification::whereDate('created_at', $date)->count();
             $data[] = $count;
         }
+
         return $data;
     }
-
 }

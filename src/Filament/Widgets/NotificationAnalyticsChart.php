@@ -2,7 +2,6 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\ChartWidget;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
 use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
@@ -10,7 +9,9 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 class NotificationAnalyticsChart extends ChartWidget
 {
     protected ?string $heading = 'Engagement Analytics (Last 7 Days)';
+
     protected static ?int $sort = 4;
+
     protected ?string $pollingInterval = '30s';
 
     public static function canView(): bool
@@ -22,7 +23,7 @@ class NotificationAnalyticsChart extends ChartWidget
     {
         $analytics = NotificationSetting::getAnalytics();
 
-        if (!($analytics['enabled'] ?? config('notifier.settings.analytics.enabled', true))) {
+        if (! ($analytics['enabled'] ?? config('notifier.settings.analytics.enabled', true))) {
             return [
                 'datasets' => [],
                 'labels' => [],
@@ -39,7 +40,7 @@ class NotificationAnalyticsChart extends ChartWidget
             $date = now()->subDays($i);
             $labels[] = $date->format('M d');
 
-            $sent = Notification::whereDate('created_at', $date)->where('status', 'sent')->count();
+            $sent = Notification::whereDate('created_at', $date)->dispatched()->count();
             $opens = Notification::whereDate('opened_at', $date)->sum('opens_count');
             $clicks = Notification::whereDate('clicked_at', $date)->sum('clicks_count');
 
@@ -123,4 +124,3 @@ class NotificationAnalyticsChart extends ChartWidget
         ];
     }
 }
-
