@@ -3,6 +3,8 @@
 namespace Usamamuneerchaudhary\Notifier\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Usamamuneerchaudhary\Notifier\Services\NotifierManager;
+use Usamamuneerchaudhary\Notifier\Testing\NotifierFake;
 
 /**
  * @method static void send($user, string $eventKey, array $data = [])
@@ -13,13 +15,27 @@ use Illuminate\Support\Facades\Facade;
  * @method static void registerEvent(string $key, array $config)
  * @method static array getRegisteredChannels()
  * @method static array getRegisteredEvents()
- * 
- * @see \Usamamuneerchaudhary\Notifier\Services\NotifierManager
+ * @method static void retryNotification(\Usamamuneerchaudhary\Notifier\Models\Notification $notification)
+ * @method static \Usamamuneerchaudhary\Notifier\Models\Notification|null dispatchFallback(\Usamamuneerchaudhary\Notifier\Models\Notification $failed)
+ *
+ * @see NotifierManager
  */
 class Notifier extends Facade
 {
+    /**
+     * Replace the notifier with a fake that records sends, for testing.
+     */
+    public static function fake(): NotifierFake
+    {
+        $fake = new NotifierFake;
+
+        static::swap($fake);
+
+        return $fake;
+    }
+
     protected static function getFacadeAccessor()
     {
         return 'notifier';
     }
-} 
+}
