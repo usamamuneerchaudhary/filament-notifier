@@ -3,6 +3,7 @@
 namespace Usamamuneerchaudhary\Notifier\Filament\Pages;
 
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -14,18 +15,23 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Usamamuneerchaudhary\Notifier\Filament\Widgets\NotificationStatsOverview;
-use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
+use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 
 class NotificationSettings extends Page
 {
     use InteractsWithForms;
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static string|null|\UnitEnum $navigationGroup = 'Notifier';
+
     protected static ?string $title = 'Notification Settings';
+
     protected static ?string $navigationLabel = 'Settings';
+
     protected static ?int $navigationSort = 1;
+
     protected string $view = 'notifier::pages.settings';
 
     public array $data;
@@ -70,6 +76,10 @@ class NotificationSettings extends Page
                 'max_per_minute' => $rateLimiting['max_per_minute'] ?? 60,
                 'max_per_hour' => $rateLimiting['max_per_hour'] ?? 1000,
                 'max_per_day' => $rateLimiting['max_per_day'] ?? 10000,
+                'mode' => $rateLimiting['mode'] ?? 'drop',
+                'max_per_user_per_hour' => $rateLimiting['max_per_user_per_hour'] ?? 0,
+                'max_per_user_per_day' => $rateLimiting['max_per_user_per_day'] ?? 0,
+                'max_per_channel_per_minute' => $rateLimiting['max_per_channel_per_minute'] ?? 0,
             ],
         ]);
     }
@@ -126,17 +136,17 @@ class NotificationSettings extends Page
                             Toggle::make('analytics.track_opens')
                                 ->label('Track Email Opens')
                                 ->default(true)
-                                ->visible(fn(Get $get): bool => $get('analytics.enabled')),
+                                ->visible(fn (Get $get): bool => $get('analytics.enabled')),
                             Toggle::make('analytics.track_clicks')
                                 ->label('Track Link Clicks')
                                 ->default(true)
-                                ->visible(fn(Get $get): bool => $get('analytics.enabled')),
+                                ->visible(fn (Get $get): bool => $get('analytics.enabled')),
                             TextInput::make('analytics.retention_days')
                                 ->label('Data Retention (Days)')
                                 ->numeric()
                                 ->default(90)
                                 ->required()
-                                ->visible(fn(Get $get): bool => $get('analytics.enabled')),
+                                ->visible(fn (Get $get): bool => $get('analytics.enabled')),
                         ]),
                 ]),
             Tab::make('Rate Limiting')
@@ -153,19 +163,45 @@ class NotificationSettings extends Page
                                 ->numeric()
                                 ->default(60)
                                 ->required()
-                                ->visible(fn(Get $get): bool => $get('rate_limiting.enabled')),
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
                             TextInput::make('rate_limiting.max_per_hour')
                                 ->label('Max Per Hour')
                                 ->numeric()
                                 ->default(1000)
                                 ->required()
-                                ->visible(fn(Get $get): bool => $get('rate_limiting.enabled')),
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
                             TextInput::make('rate_limiting.max_per_day')
                                 ->label('Max Per Day')
                                 ->numeric()
                                 ->default(10000)
                                 ->required()
-                                ->visible(fn(Get $get): bool => $get('rate_limiting.enabled')),
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
+                            Select::make('rate_limiting.mode')
+                                ->label('When a limit is reached')
+                                ->options([
+                                    'drop' => 'Drop the notification',
+                                    'defer' => 'Defer it until the limit resets',
+                                ])
+                                ->default('drop')
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
+                            TextInput::make('rate_limiting.max_per_user_per_hour')
+                                ->label('Max Per User Per Hour')
+                                ->numeric()
+                                ->default(0)
+                                ->helperText('0 disables this limit')
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
+                            TextInput::make('rate_limiting.max_per_user_per_day')
+                                ->label('Max Per User Per Day')
+                                ->numeric()
+                                ->default(0)
+                                ->helperText('0 disables this limit')
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
+                            TextInput::make('rate_limiting.max_per_channel_per_minute')
+                                ->label('Max Per Channel Per Minute')
+                                ->numeric()
+                                ->default(0)
+                                ->helperText('0 disables this limit')
+                                ->visible(fn (Get $get): bool => $get('rate_limiting.enabled')),
                         ]),
                 ]),
         ];
@@ -181,7 +217,7 @@ class NotificationSettings extends Page
             ->schema([
                 Tabs::make('Settings')
                     ->tabs($tabs)
-                    ->columnSpanFull()
+                    ->columnSpanFull(),
             ])
             ->statePath('data');
     }
@@ -199,26 +235,26 @@ class NotificationSettings extends Page
                     ->label('From Address')
                     ->email()
                     ->required()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.from_name")
                     ->label('From Name')
                     ->required()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
             ],
             'slack' => [
                 TextInput::make("channels.{$channel->type}.webhook_url")
                     ->label('Webhook URL')
                     ->url()
                     ->required()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.channel")
                     ->label('Slack Channel')
                     ->default('#notifications')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.username")
                     ->label('Bot Username')
                     ->default('Notification Bot')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
             ],
             'sms' => [
                 Select::make("channels.{$channel->type}.provider")
@@ -229,37 +265,44 @@ class NotificationSettings extends Page
                         'generic' => 'Generic API',
                     ])
                     ->required()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.twilio_account_sid")
                     ->label('Twilio Account SID')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'twilio'),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'twilio'),
                 TextInput::make("channels.{$channel->type}.twilio_auth_token")
                     ->label('Twilio Auth Token')
                     ->password()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'twilio'),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'twilio'),
                 TextInput::make("channels.{$channel->type}.twilio_phone_number")
                     ->label('Twilio Phone Number')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'twilio'),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'twilio'),
                 TextInput::make("channels.{$channel->type}.api_url")
                     ->label('API URL')
                     ->url()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'generic'),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled") && $get("channels.{$channel->type}.provider") === 'generic'),
                 TextInput::make("channels.{$channel->type}.api_key")
                     ->label('API Key')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled") && ($get("channels.{$channel->type}.provider") === 'generic' || $get("channels.{$channel->type}.provider") === 'vonage')),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled") && ($get("channels.{$channel->type}.provider") === 'generic' || $get("channels.{$channel->type}.provider") === 'vonage')),
                 TextInput::make("channels.{$channel->type}.api_secret")
                     ->label('API Secret')
                     ->password()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled") && ($get("channels.{$channel->type}.provider") === 'generic' || $get("channels.{$channel->type}.provider") === 'vonage')),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled") && ($get("channels.{$channel->type}.provider") === 'generic' || $get("channels.{$channel->type}.provider") === 'vonage')),
             ],
             'push' => [
-                TextInput::make("channels.{$channel->type}.firebase_server_key")
-                    ->label('Firebase Server Key')
-                    ->password()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.firebase_project_id")
                     ->label('Firebase Project ID')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                Textarea::make("channels.{$channel->type}.firebase_service_account")
+                    ->label('Firebase Service Account')
+                    ->rows(4)
+                    ->helperText('Paste the service account JSON, or an absolute path to the JSON file. Uses the FCM HTTP v1 API (the legacy server key is no longer supported).')
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
+            ],
+            'in_app' => [
+                Toggle::make("channels.{$channel->type}.broadcast")
+                    ->label('Also broadcast in real time')
+                    ->helperText('Requires Laravel broadcasting (Echo) to be configured for your panel.')
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
             ],
             'discord' => [
                 TextInput::make("channels.{$channel->type}.webhook_url")
@@ -267,21 +310,21 @@ class NotificationSettings extends Page
                     ->url()
                     ->required()
                     ->helperText('Get this from your Discord server settings > Integrations > Webhooks')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.username")
                     ->label('Bot Username')
                     ->helperText('Optional: Custom username for the webhook')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.avatar_url")
                     ->label('Avatar URL')
                     ->url()
                     ->helperText('Optional: URL for the webhook avatar')
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
                 TextInput::make("channels.{$channel->type}.color")
                     ->label('Embed Color')
                     ->helperText('Optional: Decimal color code for embed (e.g., 3447003 for blue)')
                     ->numeric()
-                    ->visible(fn(Get $get): bool => $get("channels.{$channel->type}.enabled")),
+                    ->visible(fn (Get $get): bool => $get("channels.{$channel->type}.enabled")),
             ],
             default => [],
         };
