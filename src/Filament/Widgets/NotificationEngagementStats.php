@@ -9,14 +9,11 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 
 class NotificationEngagementStats extends BaseWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected ?string $pollingInterval = '30s';
 
     protected static ?int $sort = 2;
-
-    public static function canView(): bool
-    {
-        return false;
-    }
 
     protected function getStats(): array
     {

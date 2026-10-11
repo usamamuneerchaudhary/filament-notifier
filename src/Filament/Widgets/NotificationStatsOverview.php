@@ -9,12 +9,9 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 
 class NotificationStatsOverview extends BaseWidget
 {
-    protected ?string $pollingInterval = '10s';
+    protected static bool $isDiscovered = false;
 
-    public static function canView(): bool
-    {
-        return false;
-    }
+    protected ?string $pollingInterval = '10s';
 
     protected function getStats(): array
     {

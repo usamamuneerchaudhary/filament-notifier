@@ -2,7 +2,6 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
@@ -10,20 +9,19 @@ use Usamamuneerchaudhary\Notifier\Services\RateLimitingService;
 
 class RateLimitingStatusWidget extends BaseWidget
 {
-    protected ?string $heading = 'Rate Limiting Status';
-    protected static ?int $sort = 6;
-    protected ?string $pollingInterval = '10s';
+    protected static bool $isDiscovered = false;
 
-    public static function canView(): bool
-    {
-        return false;
-    }
+    protected ?string $heading = 'Rate Limiting Status';
+
+    protected static ?int $sort = 6;
+
+    protected ?string $pollingInterval = '10s';
 
     protected function getStats(): array
     {
         $rateLimiting = NotificationSetting::getRateLimiting();
 
-        if (!($rateLimiting['enabled'] ?? config('notifier.settings.rate_limiting.enabled', true))) {
+        if (! ($rateLimiting['enabled'] ?? config('notifier.settings.rate_limiting.enabled', true))) {
             return [
                 Stat::make('Rate Limiting', 'Disabled')
                     ->description('Rate limiting is currently disabled')
@@ -47,19 +45,19 @@ class RateLimitingStatusWidget extends BaseWidget
         $dayPercent = $dayMax > 0 ? round(($dayUsage / $dayMax) * 100, 1) : 0;
 
         return [
-            Stat::make('Per Minute', $minuteUsage . ' / ' . $minuteMax)
-                ->description($minutePercent . '% used')
+            Stat::make('Per Minute', $minuteUsage.' / '.$minuteMax)
+                ->description($minutePercent.'% used')
                 ->descriptionIcon($minutePercent > 80 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
                 ->color($this->getColorForPercent($minutePercent))
                 ->chart([$minuteUsage, $minuteMax]),
 
-            Stat::make('Per Hour', $hourUsage . ' / ' . $hourMax)
-                ->description($hourPercent . '% used')
+            Stat::make('Per Hour', $hourUsage.' / '.$hourMax)
+                ->description($hourPercent.'% used')
                 ->descriptionIcon($hourPercent > 80 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
                 ->color($this->getColorForPercent($hourPercent)),
 
-            Stat::make('Per Day', $dayUsage . ' / ' . $dayMax)
-                ->description($dayPercent . '% used')
+            Stat::make('Per Day', $dayUsage.' / '.$dayMax)
+                ->description($dayPercent.'% used')
                 ->descriptionIcon($dayPercent > 80 ? 'heroicon-m-exclamation-triangle' : 'heroicon-m-check-circle')
                 ->color($this->getColorForPercent($dayPercent)),
         ];
@@ -76,4 +74,3 @@ class RateLimitingStatusWidget extends BaseWidget
         }
     }
 }
-

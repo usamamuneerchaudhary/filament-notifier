@@ -2,21 +2,18 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\ChartWidget;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
 
 class NotificationTimeSeriesChart extends ChartWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected ?string $heading = 'Notifications Over Time';
+
     protected static ?int $sort = 3;
+
     protected ?string $pollingInterval = '30s';
-
-
-    public static function canView(): bool
-    {
-        return false;
-    }
 
     protected function getData(): array
     {
@@ -85,4 +82,3 @@ class NotificationTimeSeriesChart extends ChartWidget
         ];
     }
 }
-

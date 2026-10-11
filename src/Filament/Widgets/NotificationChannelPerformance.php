@@ -8,16 +8,13 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 
 class NotificationChannelPerformance extends ChartWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected ?string $heading = 'Channel Performance';
 
     protected static ?int $sort = 5;
 
     protected ?string $pollingInterval = '30s';
-
-    public static function canView(): bool
-    {
-        return false;
-    }
 
     protected function getData(): array
     {

@@ -8,16 +8,13 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 
 class NotificationAnalyticsChart extends ChartWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected ?string $heading = 'Engagement Analytics (Last 7 Days)';
 
     protected static ?int $sort = 4;
 
     protected ?string $pollingInterval = '30s';
-
-    public static function canView(): bool
-    {
-        return false;
-    }
 
     protected function getData(): array
     {
