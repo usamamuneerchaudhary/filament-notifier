@@ -2,10 +2,11 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationResource\Pages;
 
-use Filament\Notifications\Notification;
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationResource;
 use Filament\Actions;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationResource;
+use Usamamuneerchaudhary\Notifier\Services\NotifierManager;
 
 class ViewNotification extends ViewRecord
 {
@@ -14,15 +15,14 @@ class ViewNotification extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('resend')
-                ->label('Resend')
+            Actions\Action::make('retry')
+                ->label('Retry')
                 ->icon('heroicon-o-arrow-path')
                 ->color('warning')
                 ->requiresConfirmation()
-                ->visible(fn () => $this->record->status === 'failed')
+                ->visible(fn () => $this->record->canBeRetried())
                 ->action(function () {
-                    $this->record->update(['status' => 'pending']);
-                    \Usamamuneerchaudhary\Notifier\Jobs\SendNotificationJob::dispatch($this->record->id);
+                    app(NotifierManager::class)->retryNotification($this->record);
 
                     Notification::make()
                         ->title('Notification queued for resending')

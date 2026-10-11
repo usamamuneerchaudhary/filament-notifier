@@ -9,6 +9,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Usamamuneerchaudhary\Notifier\Enums\NotificationStatus;
+use Usamamuneerchaudhary\Notifier\Services\ChannelDriverFactory;
 
 class NotificationForm
 {
@@ -27,13 +29,7 @@ class NotificationForm
                             ->required()
                             ->searchable(),
                         Select::make('channel')
-                            ->options([
-                                'email' => 'Email',
-                                'sms' => 'SMS',
-                                'slack' => 'Slack',
-                                'discord' => 'Discord',
-                                'push' => 'Push Notification',
-                            ])
+                            ->options(ChannelDriverFactory::TYPES)
                             ->required(),
                         TextInput::make('subject')
                             ->maxLength(255),
@@ -44,11 +40,7 @@ class NotificationForm
                             ->keyLabel('Key')
                             ->valueLabel('Value'),
                         Select::make('status')
-                            ->options([
-                                'pending' => 'Pending',
-                                'sent' => 'Sent',
-                                'failed' => 'Failed',
-                            ])
+                            ->options(NotificationStatus::options())
                             ->required(),
                         DateTimePicker::make('scheduled_at')
                             ->readonly(),
@@ -57,8 +49,32 @@ class NotificationForm
                         Textarea::make('error')
                             ->rows(3)
                             ->readonly()
-                            ->visible(fn($record) => $record && $record->status === 'failed'),
-                    ])
+                            ->visible(fn ($record) => $record && filled($record->error)),
+                    ]),
+                Section::make('Delivery timeline')
+                    ->description('Provider delivery webhooks fill in the delivered, bounced and complained times.')
+                    ->columns(3)
+                    ->schema([
+                        TextInput::make('attempts')
+                            ->numeric()
+                            ->readonly(),
+                        DateTimePicker::make('next_retry_at')
+                            ->label('Next retry at')
+                            ->readonly(),
+                        TextInput::make('provider_message_id')
+                            ->label('Provider message ID')
+                            ->readonly(),
+                        DateTimePicker::make('delivered_at')
+                            ->readonly(),
+                        DateTimePicker::make('opened_at')
+                            ->readonly(),
+                        DateTimePicker::make('clicked_at')
+                            ->readonly(),
+                        DateTimePicker::make('bounced_at')
+                            ->readonly(),
+                        DateTimePicker::make('complained_at')
+                            ->readonly(),
+                    ]),
             ]);
     }
 }
