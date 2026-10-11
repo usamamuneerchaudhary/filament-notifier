@@ -2,14 +2,12 @@
 
 namespace Usamamuneerchaudhary\Notifier\Tests\Unit\Jobs;
 
-use Illuminate\Support\Facades\Queue;
 use Usamamuneerchaudhary\Notifier\Jobs\SendNotificationJob;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
 use Usamamuneerchaudhary\Notifier\Tests\TestCase;
 
 class SendNotificationJobTest extends TestCase
 {
-
     public function test_it_handles_missing_notification()
     {
         $job = new SendNotificationJob(999);
@@ -19,7 +17,6 @@ class SendNotificationJobTest extends TestCase
         // Should not throw an exception
         $this->assertTrue(true);
     }
-
 
     public function test_it_skips_already_sent_notifications()
     {
@@ -40,7 +37,6 @@ class SendNotificationJobTest extends TestCase
         $this->assertEquals('sent', $notification->fresh()->status);
     }
 
-
     public function test_it_marks_notification_as_failed_when_driver_not_found()
     {
         $notification = Notification::create([
@@ -59,7 +55,6 @@ class SendNotificationJobTest extends TestCase
         $this->assertEquals('failed', $notification->fresh()->status);
         $this->assertStringContainsString('No driver found', $notification->fresh()->error);
     }
-
 
     public function test_it_handles_job_failure()
     {
@@ -81,7 +76,6 @@ class SendNotificationJobTest extends TestCase
         $this->assertEquals('failed', $notification->fresh()->status);
         $this->assertEquals('Test exception', $notification->fresh()->error);
     }
-
 
     public function test_it_has_correct_job_properties()
     {

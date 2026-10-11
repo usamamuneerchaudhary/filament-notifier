@@ -2,9 +2,9 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource\Pages;
 
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource;
 
 class ListNotificationTemplates extends ListRecords
 {
@@ -16,4 +16,4 @@ class ListNotificationTemplates extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-} 
+}

@@ -18,10 +18,15 @@ class EventChannelConfiguration extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-cog-6-tooth';
+
     protected static ?string $navigationLabel = 'Event Channels';
+
     protected static ?string $title = 'Event Channel Configuration';
+
     protected static string|null|\UnitEnum $navigationGroup = 'Notifier';
+
     protected static ?int $navigationSort = 3;
+
     protected string $view = 'notifier::filament.pages.event-channel-configuration';
 
     public ?array $data = [];
@@ -93,12 +98,12 @@ class EventChannelConfiguration extends Page implements HasForms
                             ->label($event->name)
                             ->content($event->description ?: '')
                             ->extraAttributes([
-                                'class' => 'font-medium text-gray-900'
+                                'class' => 'font-medium text-gray-900',
                             ]),
                         ...$channelCheckboxes,
                     ])
                     ->extraAttributes([
-                        'class' => 'border-b border-gray-200 py-4 first:pt-0 last:border-b-0 last:pb-0'
+                        'class' => 'border-b border-gray-200 py-4 first:pt-0 last:border-b-0 last:pb-0',
                     ]);
             }
 
@@ -124,14 +129,14 @@ class EventChannelConfiguration extends Page implements HasForms
         $updated = 0;
 
         foreach ($data as $key => $channels) {
-            if (!str_starts_with($key, 'event_')) {
+            if (! str_starts_with($key, 'event_')) {
                 continue;
             }
 
             $eventId = (int) str_replace('event_', '', $key);
             $event = NotificationEvent::find($eventId);
 
-            if (!$event) {
+            if (! $event) {
                 continue;
             }
 
@@ -158,4 +163,3 @@ class EventChannelConfiguration extends Page implements HasForms
             ->send();
     }
 }
-

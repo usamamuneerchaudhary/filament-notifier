@@ -13,7 +13,6 @@ use Filament\Tables\Table;
 
 class NotificationChannelTable
 {
-
     public static function configure(Table $table): Table
     {
         return $table
@@ -40,5 +39,4 @@ class NotificationChannelTable
                 ]),
             ]);
     }
-
 }

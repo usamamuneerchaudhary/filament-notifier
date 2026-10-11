@@ -1,9 +1,10 @@
 <?php
+
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource\Pages;
 
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource;
 
 class EditNotificationEvent extends EditRecord
 {

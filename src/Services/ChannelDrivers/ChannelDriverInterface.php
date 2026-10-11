@@ -15,4 +15,4 @@ interface ChannelDriverInterface
      * Validate the settings for this channel
      */
     public function validateSettings(array $settings): bool;
-} 
+}

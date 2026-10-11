@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class NotificationTemplate extends Model
 {
     protected $table = 'notifier_templates';
+
     protected $fillable = [
         'name',
         'event_key',

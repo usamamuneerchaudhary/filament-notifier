@@ -97,7 +97,6 @@ class NotificationPreferenceController extends Controller
             ->where('notification_event_id', $event->id)
             ->first();
 
-
         $channels = $this->preferenceService->getChannelsForEvent($event, $preference);
 
         return response()->json([
@@ -122,7 +121,7 @@ class NotificationPreferenceController extends Controller
             ->firstOrFail();
 
         $preferences = NotificationSetting::getPreferences();
-        if (!($preferences['allow_override'] ?? config('notifier.settings.preferences.allow_override', true))) {
+        if (! ($preferences['allow_override'] ?? config('notifier.settings.preferences.allow_override', true))) {
             return response()->json([
                 'message' => 'User preference override is disabled by administrator.',
             ], 403);
@@ -134,7 +133,7 @@ class NotificationPreferenceController extends Controller
             ->toArray();
 
         foreach (array_keys($validatedChannels) as $channelType) {
-            if (!in_array($channelType, $activeChannels)) {
+            if (! in_array($channelType, $activeChannels)) {
                 return response()->json([
                     'message' => "Channel '{$channelType}' is not available or active.",
                 ], 422);
@@ -161,7 +160,4 @@ class NotificationPreferenceController extends Controller
             'message' => 'Preferences updated successfully.',
         ]);
     }
-
 }
-
-

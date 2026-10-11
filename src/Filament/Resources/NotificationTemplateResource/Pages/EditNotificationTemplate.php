@@ -2,9 +2,9 @@
 
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource\Pages;
 
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource;
 
 class EditNotificationTemplate extends EditRecord
 {
@@ -16,4 +16,4 @@ class EditNotificationTemplate extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
-} 
+}

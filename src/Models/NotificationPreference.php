@@ -1,4 +1,5 @@
 <?php
+
 namespace Usamamuneerchaudhary\Notifier\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class NotificationPreference extends Model
 {
     protected $table = 'notifier_preferences';
+
     protected $fillable = [
         'user_id',
         'notification_event_id',

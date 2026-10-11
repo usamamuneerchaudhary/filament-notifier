@@ -50,7 +50,7 @@ class RateLimitingServiceTest extends TestCase
 
         // Set minute counter to limit
         $now = now();
-        $minuteKey = "notifier:rate_limit:minute:" . $now->format('Y-m-d-H-i');
+        $minuteKey = 'notifier:rate_limit:minute:'.$now->format('Y-m-d-H-i');
         Cache::put($minuteKey, 5, now()->addMinutes(2));
 
         $this->assertFalse($this->service->canSend());
@@ -67,7 +67,7 @@ class RateLimitingServiceTest extends TestCase
 
         // Set hour counter to limit
         $now = now();
-        $hourKey = "notifier:rate_limit:hour:" . $now->format('Y-m-d-H');
+        $hourKey = 'notifier:rate_limit:hour:'.$now->format('Y-m-d-H');
         Cache::put($hourKey, 10, now()->addHours(2));
 
         $this->assertFalse($this->service->canSend());
@@ -84,7 +84,7 @@ class RateLimitingServiceTest extends TestCase
 
         // Set day counter to limit
         $now = now();
-        $dayKey = "notifier:rate_limit:day:" . $now->format('Y-m-d');
+        $dayKey = 'notifier:rate_limit:day:'.$now->format('Y-m-d');
         Cache::put($dayKey, 10, now()->addDays(2));
 
         $this->assertFalse($this->service->canSend());
@@ -93,9 +93,9 @@ class RateLimitingServiceTest extends TestCase
     public function test_increment_updates_all_counters()
     {
         $now = now();
-        $minuteKey = "notifier:rate_limit:minute:" . $now->format('Y-m-d-H-i');
-        $hourKey = "notifier:rate_limit:hour:" . $now->format('Y-m-d-H');
-        $dayKey = "notifier:rate_limit:day:" . $now->format('Y-m-d');
+        $minuteKey = 'notifier:rate_limit:minute:'.$now->format('Y-m-d-H-i');
+        $hourKey = 'notifier:rate_limit:hour:'.$now->format('Y-m-d-H');
+        $dayKey = 'notifier:rate_limit:day:'.$now->format('Y-m-d');
 
         $this->assertEquals(0, Cache::get($minuteKey, 0));
         $this->assertEquals(0, Cache::get($hourKey, 0));
@@ -117,7 +117,7 @@ class RateLimitingServiceTest extends TestCase
     public function test_get_current_count_returns_correct_value()
     {
         $now = now();
-        $minuteKey = "notifier:rate_limit:minute:" . $now->format('Y-m-d-H-i');
+        $minuteKey = 'notifier:rate_limit:minute:'.$now->format('Y-m-d-H-i');
         Cache::put($minuteKey, 5, now()->addMinutes(2));
 
         $this->assertEquals(5, $this->service->getCurrentCount('minute'));
@@ -139,7 +139,7 @@ class RateLimitingServiceTest extends TestCase
         $this->assertArrayHasKey('minute', $status['limits']);
         $this->assertArrayHasKey('hour', $status['limits']);
         $this->assertArrayHasKey('day', $status['limits']);
-        
+
         foreach (['minute', 'hour', 'day'] as $period) {
             $this->assertArrayHasKey('max', $status['limits'][$period]);
             $this->assertArrayHasKey('current', $status['limits'][$period]);
@@ -148,6 +148,3 @@ class RateLimitingServiceTest extends TestCase
         }
     }
 }
-
-
-

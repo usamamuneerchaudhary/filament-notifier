@@ -10,14 +10,16 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 class CleanupAnalyticsCommand extends Command
 {
     protected $signature = 'notifier:cleanup-analytics {--dry-run : Show what would be cleaned without actually deleting}';
+
     protected $description = 'Clean up old analytics data based on retention settings';
 
     public function handle(): int
     {
         $analytics = NotificationSetting::getAnalytics();
 
-        if (!($analytics['enabled'] ?? config('notifier.settings.analytics.enabled', true))) {
+        if (! ($analytics['enabled'] ?? config('notifier.settings.analytics.enabled', true))) {
             $this->info('Analytics is disabled. Skipping cleanup.');
+
             return Command::SUCCESS;
         }
 
@@ -32,22 +34,23 @@ class CleanupAnalyticsCommand extends Command
             ->where(function ($q) use ($cutoffDate) {
                 $q->where(function ($subQ) use ($cutoffDate) {
                     $subQ->whereNotNull('opened_at')
-                         ->where('opened_at', '<', $cutoffDate);
+                        ->where('opened_at', '<', $cutoffDate);
                 })
-                ->orWhere(function ($subQ) use ($cutoffDate) {
-                    $subQ->whereNotNull('clicked_at')
-                         ->where('clicked_at', '<', $cutoffDate);
-                })
-                ->orWhere(function ($subQ) {
-                    $subQ->where('opens_count', '>', 0)
-                         ->orWhere('clicks_count', '>', 0);
-                });
+                    ->orWhere(function ($subQ) use ($cutoffDate) {
+                        $subQ->whereNotNull('clicked_at')
+                            ->where('clicked_at', '<', $cutoffDate);
+                    })
+                    ->orWhere(function ($subQ) {
+                        $subQ->where('opens_count', '>', 0)
+                            ->orWhere('clicks_count', '>', 0);
+                    });
             });
 
         $count = $query->count();
 
         if ($count === 0) {
             $this->info('No old analytics data found to clean up.');
+
             return Command::SUCCESS;
         }
 
@@ -68,6 +71,7 @@ class CleanupAnalyticsCommand extends Command
                     ];
                 })->toArray()
             );
+
             return Command::SUCCESS;
         }
 
@@ -84,4 +88,3 @@ class CleanupAnalyticsCommand extends Command
         return Command::SUCCESS;
     }
 }
-

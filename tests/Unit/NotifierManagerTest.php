@@ -12,14 +12,15 @@ class NotifierManagerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->manager = new NotifierManager();
+        $this->manager = new NotifierManager;
     }
-
 
     public function test_it_can_register_a_channel()
     {
-        $handler = new class {
-            public function send($user, $data) {
+        $handler = new class
+        {
+            public function send($user, $data)
+            {
                 return true;
             }
         };
@@ -40,11 +41,12 @@ class NotifierManagerTest extends TestCase
         $this->assertTrue(true);
     }
 
-
     public function test_it_can_send_notifications()
     {
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
         };
 

@@ -3,6 +3,7 @@
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources;
 
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationChannelResource\Pages\CreateNotificationChannel;
 use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationChannelResource\Pages\EditNotificationChannel;
@@ -14,11 +15,14 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 class NotificationChannelResource extends Resource
 {
     protected static ?string $model = NotificationChannel::class;
+
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-envelope';
+
     protected static string|null|\UnitEnum $navigationGroup = 'Notifier';
+
     protected static ?int $navigationSort = 3;
 
-    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
+    public static function form(Schema $schema): Schema
     {
         return NotificationChannelForm::configure($schema);
     }

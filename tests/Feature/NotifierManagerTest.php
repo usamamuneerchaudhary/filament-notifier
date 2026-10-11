@@ -5,8 +5,10 @@ namespace Usamamuneerchaudhary\Notifier\Tests\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Queue;
 use Usamamuneerchaudhary\Notifier\Jobs\SendNotificationJob;
+use Usamamuneerchaudhary\Notifier\Models\Notification;
 use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 use Usamamuneerchaudhary\Notifier\Models\NotificationEvent;
+use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 use Usamamuneerchaudhary\Notifier\Models\NotificationTemplate;
 use Usamamuneerchaudhary\Notifier\Services\NotifierManager;
 use Usamamuneerchaudhary\Notifier\Tests\TestCase;
@@ -20,7 +22,6 @@ class NotifierManagerTest extends TestCase
         parent::setUp();
         $this->manager = app('notifier');
     }
-
 
     public function test_it_can_send_notification_with_valid_event_and_template()
     {
@@ -45,7 +46,6 @@ class NotifierManagerTest extends TestCase
             'status' => 'pending',
         ]);
     }
-
 
     public function test_it_can_schedule_notification_for_later()
     {
@@ -73,7 +73,6 @@ class NotifierManagerTest extends TestCase
         Queue::assertPushed(SendNotificationJob::class);
     }
 
-
     public function test_it_respects_user_preferences()
     {
         $user = $this->createUser();
@@ -93,7 +92,6 @@ class NotifierManagerTest extends TestCase
         $this->assertDatabaseCount('notifier_notifications', 1);
     }
 
-
     public function test_it_handles_missing_event_configuration()
     {
         $user = $this->createUser();
@@ -104,7 +102,6 @@ class NotifierManagerTest extends TestCase
         // Should not create any notifications
         $this->assertDatabaseCount('notifier_notifications', 0);
     }
-
 
     public function test_it_handles_missing_template()
     {
@@ -118,7 +115,6 @@ class NotifierManagerTest extends TestCase
         // Should not create any notifications
         $this->assertDatabaseCount('notifier_notifications', 0);
     }
-
 
     public function test_it_renders_template_with_variables()
     {
@@ -134,17 +130,16 @@ class NotifierManagerTest extends TestCase
             'app_name' => 'Test App',
         ]);
 
-        $notification = \Usamamuneerchaudhary\Notifier\Models\Notification::first();
+        $notification = Notification::first();
 
         $this->assertEquals('Welcome to Test App, John Doe!', $notification->subject);
         $this->assertStringContainsString('Hi John Doe', $notification->content);
         $this->assertStringContainsString('Test App', $notification->content);
     }
 
-
     public function test_it_gets_registered_channels_and_events()
     {
-        $this->manager->registerChannel('custom', new \stdClass());
+        $this->manager->registerChannel('custom', new \stdClass);
         $this->manager->registerEvent('custom.event', ['channels' => ['email']]);
 
         $this->assertContains('custom', $this->manager->getRegisteredChannels());
@@ -164,8 +159,8 @@ class NotifierManagerTest extends TestCase
             'name' => 'John Doe',
         ]);
 
-        $notification = \Usamamuneerchaudhary\Notifier\Models\Notification::first();
-        
+        $notification = Notification::first();
+
         $this->assertNotNull($notification->data['tracking_token']);
         $this->assertEquals(32, strlen($notification->data['tracking_token']));
     }
@@ -174,7 +169,7 @@ class NotifierManagerTest extends TestCase
     {
         Queue::fake();
 
-        \Usamamuneerchaudhary\Notifier\Models\NotificationSetting::set('analytics', [
+        NotificationSetting::set('analytics', [
             'enabled' => true,
             'track_clicks' => true,
         ], 'analytics');
@@ -182,7 +177,7 @@ class NotifierManagerTest extends TestCase
         $user = $this->createUser();
         $channel = $this->createChannel('email');
         $event = $this->createEvent('user.registered');
-        
+
         $template = NotificationTemplate::create([
             'name' => 'test-template',
             'event_key' => $event->key,
@@ -192,10 +187,10 @@ class NotifierManagerTest extends TestCase
 
         $this->manager->send($user, 'user.registered', []);
 
-        $notification = \Usamamuneerchaudhary\Notifier\Models\Notification::first();
+        $notification = Notification::first();
         $token = $notification->data['tracking_token'];
         $appUrl = rtrim(config('app.url', ''), '/');
-        
+
         $this->assertStringContainsString("/notifier/track/click/{$token}", $notification->content);
         $this->assertStringContainsString('url=', $notification->content);
     }
@@ -204,7 +199,7 @@ class NotifierManagerTest extends TestCase
     {
         Queue::fake();
 
-        \Usamamuneerchaudhary\Notifier\Models\NotificationSetting::set('analytics', [
+        NotificationSetting::set('analytics', [
             'enabled' => true,
             'track_clicks' => false,
         ], 'analytics');
@@ -212,7 +207,7 @@ class NotifierManagerTest extends TestCase
         $user = $this->createUser();
         $channel = $this->createChannel('email');
         $event = $this->createEvent('user.registered');
-        
+
         $template = NotificationTemplate::create([
             'name' => 'test-template',
             'event_key' => $event->key,
@@ -222,17 +217,20 @@ class NotifierManagerTest extends TestCase
 
         $this->manager->send($user, 'user.registered', []);
 
-        $notification = \Usamamuneerchaudhary\Notifier\Models\Notification::first();
-        
+        $notification = Notification::first();
+
         $this->assertStringNotContainsString('/notifier/track/click/', $notification->content);
         $this->assertStringContainsString('https://example.com', $notification->content);
     }
 
     private function createUser()
     {
-        return new class {
+        return new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
+
             public $name = 'Test User';
         };
     }
@@ -240,7 +238,7 @@ class NotifierManagerTest extends TestCase
     private function createChannel(string $type): NotificationChannel
     {
         return NotificationChannel::create([
-            'title' => ucfirst($type) . ' Notifications',
+            'title' => ucfirst($type).' Notifications',
             'type' => $type,
             'is_active' => true,
             'settings' => [],

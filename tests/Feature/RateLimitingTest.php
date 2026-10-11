@@ -15,6 +15,7 @@ use Usamamuneerchaudhary\Notifier\Tests\TestCase;
 class RateLimitingTest extends TestCase
 {
     private NotifierManager $manager;
+
     private RateLimitingService $rateLimitingService;
 
     protected function setUp(): void
@@ -22,7 +23,7 @@ class RateLimitingTest extends TestCase
         parent::setUp();
         $this->manager = app('notifier');
         $this->rateLimitingService = app(RateLimitingService::class);
-        
+
         // Enable rate limiting for tests
         NotificationSetting::set('rate_limiting', [
             'enabled' => true,
@@ -78,7 +79,7 @@ class RateLimitingTest extends TestCase
 
         // Manually set hour counter to limit using expected key format
         $now = now();
-        $hourKey = "notifier:rate_limit:hour:" . $now->format('Y-m-d-H');
+        $hourKey = 'notifier:rate_limit:hour:'.$now->format('Y-m-d-H');
         Cache::put($hourKey, 10, now()->addHours(2));
 
         // Try to send notification
@@ -97,7 +98,7 @@ class RateLimitingTest extends TestCase
 
         // Manually set day counter to limit using expected key format
         $now = now();
-        $dayKey = "notifier:rate_limit:day:" . $now->format('Y-m-d');
+        $dayKey = 'notifier:rate_limit:day:'.$now->format('Y-m-d');
         Cache::put($dayKey, 20, now()->addDays(2));
 
         // Try to send notification
@@ -115,9 +116,9 @@ class RateLimitingTest extends TestCase
         $this->setupTestData();
 
         $now = now();
-        $minuteKey = "notifier:rate_limit:minute:" . $now->format('Y-m-d-H-i');
-        $hourKey = "notifier:rate_limit:hour:" . $now->format('Y-m-d-H');
-        $dayKey = "notifier:rate_limit:day:" . $now->format('Y-m-d');
+        $minuteKey = 'notifier:rate_limit:minute:'.$now->format('Y-m-d-H-i');
+        $hourKey = 'notifier:rate_limit:hour:'.$now->format('Y-m-d-H');
+        $dayKey = 'notifier:rate_limit:day:'.$now->format('Y-m-d');
 
         $this->assertEquals(0, Cache::get($minuteKey, 0));
         $this->assertEquals(0, Cache::get($hourKey, 0));
@@ -202,11 +203,13 @@ class RateLimitingTest extends TestCase
 
     private function createUser()
     {
-        return new class {
+        return new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
+
             public $name = 'Test User';
         };
     }
 }
-

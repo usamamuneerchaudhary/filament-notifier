@@ -15,7 +15,6 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationEvent;
 
 class NotificationTemplateTable
 {
-
     public static function configure(Table $table): Table
     {
         return $table
@@ -37,7 +36,7 @@ class NotificationTemplateTable
             ->filters([
                 SelectFilter::make('event_key')
                     ->label('Event')
-                    ->options(fn() => NotificationEvent::pluck('name', 'key')->toArray()),
+                    ->options(fn () => NotificationEvent::pluck('name', 'key')->toArray()),
                 TernaryFilter::make('is_active'),
             ])
             ->recordActions([
@@ -50,5 +49,4 @@ class NotificationTemplateTable
                 ]),
             ]);
     }
-
 }

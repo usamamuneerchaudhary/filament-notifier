@@ -13,7 +13,7 @@ use Usamamuneerchaudhary\Notifier\Services\AnalyticsService;
  * @method static void trackOpen(\Usamamuneerchaudhary\Notifier\Models\Notification $notification)
  * @method static void trackClick(\Usamamuneerchaudhary\Notifier\Models\Notification $notification)
  *
- * @see \Usamamuneerchaudhary\Notifier\Services\AnalyticsService
+ * @see AnalyticsService
  */
 class Analytics extends Facade
 {
@@ -25,4 +25,3 @@ class Analytics extends Facade
         return AnalyticsService::class;
     }
 }
-

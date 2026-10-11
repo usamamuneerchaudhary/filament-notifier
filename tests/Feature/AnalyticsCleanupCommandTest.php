@@ -122,4 +122,3 @@ class AnalyticsCleanupCommandTest extends TestCase
         $this->assertStringContainsString('No old analytics data found', Artisan::output());
     }
 }
-

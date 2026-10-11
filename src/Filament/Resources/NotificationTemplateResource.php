@@ -3,6 +3,7 @@
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources;
 
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate;
 use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationTemplateResource\Pages\EditNotificationTemplate;
@@ -14,11 +15,14 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationTemplate;
 class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
+
     protected static string|null|\BackedEnum $navigationIcon = 'heroicon-o-document-text';
+
     protected static string|null|\UnitEnum $navigationGroup = 'Notifier';
+
     protected static ?int $navigationSort = 4;
 
-    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
+    public static function form(Schema $schema): Schema
     {
         return NotificationTemplateForm::configure($schema);
     }

@@ -16,16 +16,17 @@ class EmailDriverTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->driver = new EmailDriver();
+        $this->driver = new EmailDriver;
     }
-
 
     public function test_it_can_send_email_notification()
     {
         Mail::fake();
 
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
         };
 
@@ -49,11 +50,12 @@ class EmailDriverTest extends TestCase
         $this->assertTrue($result);
     }
 
-
     public function test_it_returns_false_when_user_has_no_email()
     {
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = null;
         };
 
@@ -73,7 +75,6 @@ class EmailDriverTest extends TestCase
         $this->assertFalse($result);
     }
 
-
     public function test_it_returns_false_when_user_is_null()
     {
         $notification = Notification::create([
@@ -91,7 +92,6 @@ class EmailDriverTest extends TestCase
 
         $this->assertFalse($result);
     }
-
 
     public function test_it_validates_settings_correctly()
     {
@@ -125,8 +125,10 @@ class EmailDriverTest extends TestCase
 
         config(['app.url' => 'https://example.com']);
 
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
         };
 
@@ -165,8 +167,10 @@ class EmailDriverTest extends TestCase
             'settings' => ['from_address' => 'test@example.com'],
         ]);
 
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
         };
 
@@ -200,8 +204,10 @@ class EmailDriverTest extends TestCase
             'settings' => ['from_address' => 'test@example.com'],
         ]);
 
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
         };
 
@@ -234,8 +240,10 @@ class EmailDriverTest extends TestCase
             'settings' => ['from_address' => 'test@example.com'],
         ]);
 
-        $user = new class {
+        $user = new class
+        {
             public $id = 1;
+
             public $email = 'test@example.com';
         };
 

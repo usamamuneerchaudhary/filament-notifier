@@ -1,8 +1,9 @@
 <?php
+
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource\Pages;
 
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource;
 use Filament\Resources\Pages\CreateRecord;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource;
 
 class CreateNotificationEvent extends CreateRecord
 {

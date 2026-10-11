@@ -10,11 +10,11 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationResource;
-use Usamamuneerchaudhary\Notifier\Models\NotificationEvent;
-use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
-use Usamamuneerchaudhary\Notifier\Services\NotifierManager;
 use Illuminate\Support\Facades\Log;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationResource;
+use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
+use Usamamuneerchaudhary\Notifier\Models\NotificationEvent;
+use Usamamuneerchaudhary\Notifier\Services\NotifierManager;
 
 class ListNotifications extends ListRecords
 {
@@ -38,9 +38,10 @@ class ListNotifications extends ListRecords
                                 ->mapWithKeys(function ($event) {
                                     $hasTemplate = $event->templates()->exists();
                                     $label = $event->name;
-                                    if (!$hasTemplate) {
+                                    if (! $hasTemplate) {
                                         $label .= ' (⚠️ No template)';
                                     }
+
                                     return [$event->key => $label];
                                 })
                                 ->toArray();
@@ -71,6 +72,7 @@ class ListNotifications extends ListRecords
                         ->helperText('Select the user to send the notification to')
                         ->options(function () {
                             $userModel = config('auth.providers.users.model');
+
                             return $userModel::whereNotNull('email')
                                 ->get()
                                 ->mapWithKeys(fn ($user) => [$user->id => "{$user->name} ({$user->email})"])
@@ -112,18 +114,18 @@ class ListNotifications extends ListRecords
                         $userModel = config('auth.providers.users.model');
                         $user = $userModel::find($data['user_id']);
 
-                        if (!$user) {
+                        if (! $user) {
                             throw new \Exception('User not found');
                         }
 
                         // Check if event has a template
                         $event = NotificationEvent::where('key', $data['event_key'])->first();
-                        if (!$event) {
+                        if (! $event) {
                             throw new \Exception("Event '{$data['event_key']}' not found");
                         }
 
                         $template = $event->templates()->first();
-                        if (!$template) {
+                        if (! $template) {
                             throw new \Exception("Event '{$event->name}' does not have a template linked to it. Please create a template and link it to this event.");
                         }
 
@@ -134,7 +136,7 @@ class ListNotifications extends ListRecords
                         $channelsUsed = [];
 
                         // Check if testing all channels
-                        if (!empty($data['test_all_channels'])) {
+                        if (! empty($data['test_all_channels'])) {
                             // Get selected channels or all active channels
                             $selectedChannels = $data['channels'] ?? [];
 
@@ -157,14 +159,14 @@ class ListNotifications extends ListRecords
 
                         Notification::make()
                             ->title('Test notification sent successfully!')
-                            ->body($message . ". Check the notifications list below to see the status.")
+                            ->body($message.'. Check the notifications list below to see the status.')
                             ->success()
                             ->send();
                     } catch (\Exception $e) {
-                        Log::error('Failed to send test notification: ' . $e->getMessage(), [
+                        Log::error('Failed to send test notification: '.$e->getMessage(), [
                             'event_key' => $data['event_key'] ?? null,
                             'user_id' => $data['user_id'] ?? null,
-                            'trace' => $e->getTraceAsString()
+                            'trace' => $e->getTraceAsString(),
                         ]);
 
                         Notification::make()

@@ -3,6 +3,7 @@
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources;
 
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource\Pages\CreateNotificationEvent;
 use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationEventResource\Pages\EditNotificationEvent;
@@ -21,8 +22,7 @@ class NotificationEventResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-
-    public static function form(\Filament\Schemas\Schema $schema): \Filament\Schemas\Schema
+    public static function form(Schema $schema): Schema
     {
         return NotificationEventForm::configure($schema);
     }

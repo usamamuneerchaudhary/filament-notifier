@@ -3,20 +3,19 @@
 namespace Usamamuneerchaudhary\Notifier\Tests\Unit;
 
 use Usamamuneerchaudhary\Notifier\NotifierServiceProvider;
+use Usamamuneerchaudhary\Notifier\Services\NotifierManager;
 use Usamamuneerchaudhary\Notifier\Tests\TestCase;
 
 class NotifierServiceProviderTest extends TestCase
 {
-
     public function test_it_registers_notifier_service()
     {
         $this->assertTrue($this->app->bound('notifier'));
         $this->assertInstanceOf(
-            \Usamamuneerchaudhary\Notifier\Services\NotifierManager::class,
+            NotifierManager::class,
             $this->app->make('notifier')
         );
     }
-
 
     public function test_it_registers_model_bindings()
     {
@@ -26,7 +25,6 @@ class NotifierServiceProviderTest extends TestCase
         $this->assertTrue($this->app->bound('notifier.preference'));
         $this->assertTrue($this->app->bound('notifier.notification'));
     }
-
 
     public function test_it_loads_migrations()
     {
@@ -38,12 +36,10 @@ class NotifierServiceProviderTest extends TestCase
         $this->assertTrue(true);
     }
 
-
     public function test_it_loads_views()
     {
         $this->assertTrue(view()->exists('notifier::pages.settings'));
     }
-
 
     public function test_it_has_correct_package_name()
     {

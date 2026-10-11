@@ -15,7 +15,6 @@ use Usamamuneerchaudhary\Notifier\Models\NotificationEvent;
 
 class NotificationEventTable
 {
-
     public static function configure(Table $table): Table
     {
         return $table
@@ -43,7 +42,7 @@ class NotificationEventTable
             ])
             ->filters([
                 SelectFilter::make('group')
-                    ->options(fn() => NotificationEvent::pluck('group', 'group')->toArray()),
+                    ->options(fn () => NotificationEvent::pluck('group', 'group')->toArray()),
 
                 TernaryFilter::make('is_active')
                     ->label('Active Status'),
@@ -59,5 +58,4 @@ class NotificationEventTable
             ])
             ->defaultSort('created_at', 'desc');
     }
-
 }

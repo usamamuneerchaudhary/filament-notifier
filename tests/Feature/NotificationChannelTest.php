@@ -2,13 +2,12 @@
 
 namespace Usamamuneerchaudhary\Notifier\Tests\Feature;
 
-use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 use Usamamuneerchaudhary\Notifier\Models\Notification;
+use Usamamuneerchaudhary\Notifier\Models\NotificationChannel;
 use Usamamuneerchaudhary\Notifier\Tests\TestCase;
 
 class NotificationChannelTest extends TestCase
 {
-
     public function test_it_can_create_a_notification_channel()
     {
         $channel = NotificationChannel::create([
@@ -33,7 +32,6 @@ class NotificationChannelTest extends TestCase
         $this->assertTrue($channel->is_active);
         $this->assertIsArray($channel->settings);
     }
-
 
     public function test_it_can_have_many_notifications()
     {
@@ -66,7 +64,6 @@ class NotificationChannelTest extends TestCase
         $this->assertEquals('Test Subject 1', $channel->notifications->first()->subject);
     }
 
-
     public function test_it_casts_boolean_fields_correctly()
     {
         $channel = NotificationChannel::create([
@@ -79,7 +76,6 @@ class NotificationChannelTest extends TestCase
         $this->assertTrue($channel->is_active);
         $this->assertIsBool($channel->is_active);
     }
-
 
     public function test_it_casts_settings_as_array()
     {

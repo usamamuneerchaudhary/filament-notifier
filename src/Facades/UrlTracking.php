@@ -10,7 +10,7 @@ use Usamamuneerchaudhary\Notifier\Services\UrlTrackingService;
  * @method static RedirectResponse safeRedirect(string $url)
  * @method static string rewriteUrlsForTracking(string $content, string $token)
  *
- * @see \Usamamuneerchaudhary\Notifier\Services\UrlTrackingService
+ * @see UrlTrackingService
  */
 class UrlTracking extends Facade
 {
@@ -22,4 +22,3 @@ class UrlTracking extends Facade
         return UrlTrackingService::class;
     }
 }
-

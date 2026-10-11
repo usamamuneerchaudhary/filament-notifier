@@ -1,9 +1,10 @@
 <?php
+
 namespace Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationChannelResource\Pages;
 
-use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationChannelResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Usamamuneerchaudhary\Notifier\Filament\Resources\NotificationChannelResource;
 
 class EditNotificationChannel extends EditRecord
 {

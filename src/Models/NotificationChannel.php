@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class NotificationChannel extends Model
 {
     protected $table = 'notifier_channels';
+
     protected $fillable = [
         'title',
         'type',

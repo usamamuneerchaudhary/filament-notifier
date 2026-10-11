@@ -8,7 +8,7 @@ use Usamamuneerchaudhary\Notifier\Services\NotificationRepository;
 /**
  * @method \Usamamuneerchaudhary\Notifier\Models\Notification|null findByToken(string $token)
  *
- * @see \Usamamuneerchaudhary\Notifier\Services\NotificationRepository
+ * @see NotificationRepository
  */
 class NotificationRepo extends Facade
 {
@@ -20,4 +20,3 @@ class NotificationRepo extends Facade
         return NotificationRepository::class;
     }
 }
-
