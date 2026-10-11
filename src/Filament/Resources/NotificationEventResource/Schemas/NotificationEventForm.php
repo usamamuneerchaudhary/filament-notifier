@@ -69,7 +69,7 @@ class NotificationEventForm
                             ->label('Event Settings')
                             ->keyLabel('Setting Name')
                             ->valueLabel('Setting Value')
-                            ->helperText('Optional: Configure event-specific settings. Common settings include "channels" (array of channel types) and "template" (template key). You can also configure these in config/notifier.php. Note: Run migrations to add the settings column if you see an error.')
+                            ->helperText('Optional: Configure event-specific settings. Common settings include "channels" (comma separated channel types), "template" (template key) and fallbacks such as "fallback.email" = "sms" (send via SMS if email permanently fails). You can also configure these in config/notifier.php. Note: Run migrations to add the settings column if you see an error.')
                             ->addable(true)
                             ->deletable(true)
                             ->reorderable()

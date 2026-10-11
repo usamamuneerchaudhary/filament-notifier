@@ -32,10 +32,11 @@ class NotificationChannelForm
                             ->helperText('The unique identifier for this channel type. This must match one of the supported channel types.')
                             ->options([
                                 'email' => 'Email - Send notifications via email',
+                                'in_app' => 'In-app - Filament database notifications (the bell icon)',
                                 'slack' => 'Slack - Send notifications to Slack workspace',
                                 'discord' => 'Discord - Send notifications to Discord server via webhook',
                                 'sms' => 'SMS - Send text message notifications',
-                                'push' => 'Push - Send push notifications (Firebase FCM)',
+                                'push' => 'Push - Send push notifications (Firebase FCM HTTP v1)',
                             ])
                             ->required()
                             ->unique(ignoreRecord: true)
@@ -101,9 +102,17 @@ class NotificationChannelForm
                             ->rows(4)
                             ->columnSpanFull(),
 
+                        Textarea::make('in_app_example')
+                            ->label('In-app Channel Settings')
+                            ->default("broadcast: false\nstatus: info\n\n# Requires the notifications table (php artisan make:notifications-table)\n# and ->databaseNotifications() on your Filament panel.")
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->rows(5)
+                            ->columnSpanFull(),
+
                         Textarea::make('push_example')
                             ->label('Push Channel Settings (Firebase)')
-                            ->default("firebase_server_key: YOUR_SERVER_KEY\nfirebase_project_id: YOUR_PROJECT_ID")
+                            ->default("firebase_project_id: YOUR_PROJECT_ID\nfirebase_service_account: /absolute/path/to/service-account.json")
                             ->disabled()
                             ->dehydrated(false)
                             ->rows(3)
