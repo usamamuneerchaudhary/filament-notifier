@@ -2,6 +2,7 @@
 
 namespace Usamamuneerchaudhary\Notifier\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
@@ -26,18 +27,17 @@ class NotificationTrackingController extends Controller
         try {
             $notification = $this->notificationRepository->findByToken($token);
 
-            if (!$notification) {
+            if (! $notification) {
                 return $this->transparentPixel();
             }
 
-            if (!$this->analyticsService->isOpenTrackingEnabled()) {
+            if (! $this->analyticsService->isOpenTrackingEnabled()) {
                 return $this->transparentPixel();
             }
 
             $this->analyticsService->trackOpen($notification);
-
         } catch (\Exception $e) {
-            Log::error("Failed to track notification open: " . $e->getMessage(), [
+            Log::error('Failed to track notification open: '.$e->getMessage(), [
                 'token' => $token,
             ]);
         }
@@ -46,38 +46,39 @@ class NotificationTrackingController extends Controller
     }
 
     /**
-     * Track link click - redirects to original URL
+     * Track link click - redirects to original URL.
+     *
+     * Signed links (and URLs that were part of the notification) may point anywhere over http(s).
+     * Anything else only redirects within this site or to the configured allowed hosts.
      */
-    public function trackClick(string $token, Request $request)
+    public function trackClick(string $token, Request $request): RedirectResponse
     {
+        $originalUrl = (string) $request->query('url', '/');
+
         try {
-            $notification = $this->notificationRepository->findByToken($token);
-
-            if (!$notification) {
-                return redirect()->to($request->get('url', '/'));
-            }
-
-            if (!$this->analyticsService->isClickTrackingEnabled()) {
-                return $this->urlTrackingService->safeRedirect($request->get('url', '/'));
-            }
-
-            $originalUrl = $request->get('url', '/');
-
-            if (empty($originalUrl) || $originalUrl === '/') {
+            if ($originalUrl === '' || $originalUrl === '/') {
                 return redirect()->to('/');
             }
 
-            $this->analyticsService->trackClick($notification);
+            $notification = $this->notificationRepository->findByToken($token);
 
-            return $this->urlTrackingService->safeRedirect($originalUrl);
+            $isTrusted = $request->hasValidRelativeSignature()
+                || ($notification !== null && $this->urlTrackingService->wasLinkedInNotification($notification, $originalUrl));
 
+            if ($notification && $this->analyticsService->isClickTrackingEnabled()) {
+                $this->analyticsService->trackClick($notification);
+            }
+
+            return $isTrusted
+                ? $this->urlTrackingService->safeRedirect($originalUrl)
+                : $this->urlTrackingService->restrictedRedirect($originalUrl, $request);
         } catch (\Exception $e) {
-            Log::error("Failed to track notification click: " . $e->getMessage(), [
+            Log::error('Failed to track notification click: '.$e->getMessage(), [
                 'token' => $token,
-                'url' => $request->get('url'),
+                'url' => $originalUrl,
             ]);
 
-            return $this->urlTrackingService->safeRedirect($request->get('url', '/'));
+            return $this->urlTrackingService->restrictedRedirect($originalUrl, $request);
         }
     }
 
@@ -95,4 +96,3 @@ class NotificationTrackingController extends Controller
             ->header('Expires', '0');
     }
 }
-
