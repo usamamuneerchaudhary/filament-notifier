@@ -2,11 +2,10 @@
 
 namespace Usamamuneerchaudhary\Notifier\Services;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Log;
 use Usamamuneerchaudhary\Notifier\Models\NotificationSetting;
 use Usamamuneerchaudhary\Notifier\Models\NotificationTemplate;
-use Usamamuneerchaudhary\Notifier\Services\AnalyticsService;
-use Usamamuneerchaudhary\Notifier\Services\UrlTrackingService;
 
 class TemplateRenderingService
 {
@@ -20,8 +19,11 @@ class TemplateRenderingService
 
         $allData = $this->prepareData($data);
 
-        $subject = $this->replaceVariables($subject, $allData);
-        $content = $this->replaceVariables($content, $allData);
+        // Values are HTML-escaped only for HTML emails, so plain text channels keep apostrophes and ampersands intact.
+        $escapeValues = $channelType === 'email' && $this->isHtml($content);
+
+        $subject = $this->replaceVariables($subject, $allData, false);
+        $content = $this->replaceVariables($content, $allData, $escapeValues);
 
         $this->logUnreplacedVariables($subject, $content, $allData, $template);
 
@@ -62,17 +64,45 @@ class TemplateRenderingService
     }
 
     /**
-     * Replace template variables in content
+     * Replace template variables in content.
+     *
+     * `{{ name }}` is escaped when $escape is true, `{{{ name }}}` always inserts the raw value.
      */
-    protected function replaceVariables(string $content, array $data): string
+    protected function replaceVariables(string $content, array $data, bool $escape = false): string
     {
-        // Pattern matches {{variable}}
-        $pattern = '/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/';
+        $pattern = '/\{\{\{\s*([a-zA-Z0-9_]+)\s*\}\}\}|\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/';
 
-        return preg_replace_callback($pattern, function ($matches) use ($data) {
-            $varName = $matches[1];
-            return $data[$varName] ?? $matches[0];
+        return preg_replace_callback($pattern, function ($matches) use ($data, $escape) {
+            $isRaw = ($matches[1] ?? '') !== '';
+            $varName = $isRaw ? $matches[1] : $matches[2];
+
+            if (! isset($data[$varName])) {
+                return $matches[0];
+            }
+
+            $value = $data[$varName];
+
+            if ($value instanceof Htmlable) {
+                return $value->toHtml();
+            }
+
+            if (is_bool($value)) {
+                $value = $value ? '1' : '0';
+            }
+
+            if (! is_scalar($value) && ! $value instanceof \Stringable) {
+                return $matches[0];
+            }
+
+            $value = (string) $value;
+
+            return $escape && ! $isRaw ? e($value) : $value;
         }, $content);
+    }
+
+    protected function isHtml(string $content): bool
+    {
+        return strip_tags($content) !== $content;
     }
 
     /**
@@ -81,24 +111,22 @@ class TemplateRenderingService
     protected function logUnreplacedVariables(string $subject, string $content, array $allData, NotificationTemplate $template): void
     {
         $logUnreplaced = NotificationSetting::get('log_unreplaced_variables', config('notifier.settings.log_unreplaced_variables', false));
-        if (!$logUnreplaced) {
+        if (! $logUnreplaced) {
             return;
         }
 
-        $pattern = '/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/';
-        preg_match_all($pattern, $subject . $content, $unreplaced);
+        $pattern = '/\{\{\{?\s*([a-zA-Z0-9_]+)\s*\}?\}\}/';
+        preg_match_all($pattern, $subject.$content, $unreplaced);
 
-        if (!empty($unreplaced[1])) {
+        if (! empty($unreplaced[1])) {
             $missing = array_unique($unreplaced[1]);
-            $missing = array_filter($missing, fn($var) => !isset($allData[$var]));
-            if (!empty($missing)) {
-                Log::warning("Unreplaced template variables: " . implode(', ', $missing), [
+            $missing = array_filter($missing, fn ($var) => ! isset($allData[$var]));
+            if (! empty($missing)) {
+                Log::warning('Unreplaced template variables: '.implode(', ', $missing), [
                     'template_id' => $template->id,
                     'template_name' => $template->name,
                 ]);
             }
         }
     }
-
 }
-
