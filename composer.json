@@ -65,7 +65,7 @@
         "nunomaduro/collision": "^8.6",
         "orchestra/testbench": "^9.11|^10.0|^11.0",
         "phpunit/phpunit": "^11.5|^12.0|^13.0",
-        "usamamuneerchaudhary/laravel-slipway": "^1.4"
+        "usamamuneerchaudhary/laravel-slipway": "^1.8"
     },
     "config": {
         "sort-packages": true
